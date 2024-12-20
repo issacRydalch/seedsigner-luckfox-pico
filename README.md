@@ -4,34 +4,25 @@ Port of the SeedSigner code to the LuckFox Pico Pro/Max embedded ARM(ricv?) linu
 
 ## Dev machine setup
 ```
-brew install android-platform-tools
+# mac
+brew install homebrew/cask/android-platform-tools
+
+# linux
+sudo apt install android-tools-adb
 ```
 
 ## Initial Hardware Setup
 
-## Flash SD Card
-```
-sudo dd bs=4M status=progress if=/Users/lightningspore/Downloads/pro_buildroot_sd/update.img of=/dev/disk5
-```
 
 This configures the GPIO on the device
 ```
 adb push config/luckfox.cfg /etc/luckfox.cfg
 
-# rebo
-```
-
-## Package individually made OS images to a flashable version
-```
-cd 
-./blkenvflash/buildroot final-image.img
+# reboot the device
 ```
 
 ## Hardware Test Suite
 
-### Test Buttons
-
-### Test LCD
 ```
 # push over the test file
 adb push test_suite /
@@ -41,8 +32,53 @@ adb push test_suite /
 adb shell
 ```
 
-### Test Camera
- 
+### Run Test Suite
+```
+cd /test_suite
+python test.py
+```
+
+## More Setup
+```
+# Make sure pip is available
+python -m ensurepip --default-pip
+```
+
+## Download Python source packages (no wheels!)
+```
+pip download -r requirements.txt --no-binary ":all"
+# TODO: For each python dep, untar, or unzip the downloaded file from pypi
+adb push python_deps /
+
+# ON LUCKFOX INSTALL OLD FASHIONED WAY
+cd /python_deps/qrcode...
+python setup.py install
+```
+
+
+## Copy over modified SeedSigner code
+```
+git clone https://github.com/lightningspore/seedsigner.git
+cd seedsigner
+git checkout 0.8.0-luckfox
+adb push src /seedsigner
+```
+
+## Run seedsigner
+```
+cd /seedsigner
+python main.py
+```
 
 
 
+## Package individually made OS images to a flashable version
+```
+cd 
+./blkenvflash final-image.img
+```
+
+## Flash SD Card
+```
+sudo dd bs=4M status=progress if=/Users/lightningspore/Downloads/pro_buildroot_sd/update.img of=/dev/disk5
+```
